@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import axios from 'axios';
 
 const Test = () => {
@@ -9,25 +9,20 @@ const Test = () => {
     const address = useRef('');
     const password = useRef('');
 
-    
+    const [items, setItems] = useState([]);
     useEffect(() => {
         const data = async() => {
-            const data = await axios.post("http://localhost/dogs_store/server/api/test.php");
-            console.log(data);
+            const data = await axios.get("http://localhost/dogs_store/server/api.php?table=dogs");
+            setItems(data.data[0]);
         }
-        //data();
+        data();
+
+        console.log(items);
     }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const res = await axios.post("http://localhost/dogs_store/server/api/dogs.php", {
-            name: name.current.value,
-            surname: surname.current.value,
-            email: email.current.value,
-            phone: phone.current.value,
-            address: address.current.value,
-            password: password.current.value
-        });
+        const res = await axios.delete("http://localhost/dogs_store/server/api.php?table=users&id=7");
         if(res) {
             console.log(res.data)
         }

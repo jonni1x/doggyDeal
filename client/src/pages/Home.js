@@ -1,13 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Player } from '@lottiefiles/react-lottie-player';
 import { Link } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import axios from 'axios';
 
 const Home = () => {
     const [logedIn, setLogedIn] = useState(false);
+    const [items, setItems] = useState(null);
+
+    const fetchData = async () => {
+        const res = await axios.get("http://localhost/dogs_store/server/api.php?table=dogs&limit=6");
+        const data = await res.data[0];
+        setItems(data);
+    }
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
     let feedbackSettings = {
         dots: true,
         infinite: true,
@@ -58,51 +71,20 @@ const Home = () => {
             </div>
             <div className='container' style={{height: '500px'}}>
                 <Slider {...dogsSettings}>
-                    <div className="card w-75" >
-                    <img src={require("../assets/images/no-image.jpg")}
-                    className="card-img-top" style={{height: "300px", width: "100%", objectFit:"cover"}}  alt="..." />
+                {
+                items !== null &&  items.map(item => {
+                    
+                    return (
+                    <div className="card w-75" key={item.id}>
+                        <img src={require(`../assets/images/${item.image}`)}
+                        className="card-img-top" style={{height: "300px", width: "100%", objectFit:"cover"}}  alt="..." />
                         <div className="card-body">
-                            <h5 className="card-title">Special title treatment</h5>
-                            <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                            <a href="#" className="btn btn-primary">Go somewhere</a>
+                            <p className="card-text">{item.description}</p>
+                            <Link className='btn btn-primary' to={`dogs/${item.id}`}>Buy</Link>
                         </div>
-                    </div>
-                    <div className="card w-75" >
-                    <img src={require("../assets/images/no-image.jpg")}
-                    className="card-img-top" style={{height: "300px", width: "100%", objectFit:"cover"}}  alt="..." />
-                        <div className="card-body">
-                            <h5 className="card-title">Special title treatment</h5>
-                            <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                            <a href="#" className="btn btn-primary">Go somewhere</a>
-                        </div>
-                    </div>
-                    <div className="card w-75" >
-                    <img src={require("../assets/images/no-image.jpg")}
-                    className="card-img-top" style={{height: "300px", width: "100%", objectFit:"cover"}}  alt="..." />
-                        <div className="card-body">
-                            <h5 className="card-title">Special title treatment</h5>
-                            <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                            <a href="#" className="btn btn-primary">Go somewhere</a>
-                        </div>
-                    </div>
-                    <div className="card w-75" >
-                    <img src={require("../assets/images/no-image.jpg")}
-                    className="card-img-top" style={{height: "300px", width: "100%", objectFit:"cover"}}  alt="..." />
-                        <div className="card-body">
-                            <h5 className="card-title">Special title treatment</h5>
-                            <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                            <a href="#" className="btn btn-primary">Go somewhere</a>
-                        </div>
-                    </div>
-                    <div className="card w-75" >
-                    <img src={require("../assets/images/no-image.jpg")}
-                    className="card-img-top" style={{height: "300px", width: "100%", objectFit:"cover"}}  alt="..." />
-                        <div className="card-body">
-                            <h5 className="card-title">Special title treatment</h5>
-                            <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                            <a href="#" className="btn btn-primary">Go somewhere</a>
-                        </div>
-                    </div>
+                    </div>)
+                }) 
+                }
                 </Slider>
             </div>
         </div>
