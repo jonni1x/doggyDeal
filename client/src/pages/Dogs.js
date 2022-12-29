@@ -1,6 +1,9 @@
-import axios from 'axios';
-import React, { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import axios, { all } from 'axios';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Player } from '@lottiefiles/react-lottie-player';
+import Pagination from '../components/Pagination';
+import DogCard from '../components/DogCard';
 
 const Dogs = () => {
     const [lowestPrice, setLowestPrice] = useState(0); 
@@ -9,14 +12,35 @@ const Dogs = () => {
     const [year, setYear] = useState(null); 
     const [dogs, setDogs] = useState([]); 
     const [filter, setFilter] = useState(false);
+    const [pages, setPages] = useState(1);
+    const [pageNumber, setPageNumber] = useState(1);
 
+
+    const allPages = () => {
+        const pagesArr = [];
+        for(let i = 1; i < pages + 1; i++) {
+            pagesArr.push(i);
+        }
+        return pagesArr;
+    }
+
+    const changePage = (value) => {
+        setPageNumber(value); 
+    }
+
+    const data = () => {
+        axios.get(`http://localhost/dogs_store/server/api.php?table=dogs&price=${lowestPrice}-${highestPrice}&breed=${breed}&year=${year}&page=${pageNumber}`)
+            .then(res => {
+                setPages(res.data.total_pages);
+                setDogs(res.data[0]);
+            })
+            .catch(e => e.message);
+    }
 
     useEffect(() => {
-        axios.get(`http://localhost/dogs_store/server/api.php?table=dogs&price=${lowestPrice}-${highestPrice}&breed=${breed}&year=${year}`)
-            .then(res => setDogs(res.data[0]))
-            .catch(e => e.message);
-    }, [filter])
-    
+        data();
+    }, [filter, pageNumber])
+
     const handleFilter = (e) => {
         e.preventDefault();
         setFilter(!filter);
@@ -24,7 +48,7 @@ const Dogs = () => {
 
   return (
     <div className='rooms' style={{marginTop: "100px"}}>
-        <nav class="navbar">
+        <nav className="navbar">
             <button
             className="navbar-toggler btn bg-primary text-white ms-4 py-2 px-5"
             type="button" 
@@ -34,7 +58,7 @@ const Dogs = () => {
                 Filter
             </button>
             <div className="container-fluid">
-                <div className="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                <div className="offcanvas offcanvas-end" tabIndex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
                 <div className="offcanvas-header">
                     <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
@@ -49,9 +73,9 @@ const Dogs = () => {
                                 name='lowest-price'
                                 value={lowestPrice}
                                 onChange={e => {
-                                    if(e.target.value < 0) {
-                                        return e.target.value = 0;
-                                    }
+                                    if(e.target.value < 0) return e.target.value = 0;
+
+                                    if(e.target.value > highestPrice - 1) return e.target.value = highestPrice - 1;
                                     setLowestPrice(e.target.value)
                                 }}
                                 />
@@ -68,7 +92,7 @@ const Dogs = () => {
                                 <label htmlFor='breed' className='me-3'>Breed:</label>
                                 <select name="breed" id="breed" onChange={e => setBreed(e.target.value)}>
                                     <option value="pitbull">Pitbull</option>
-                                    <option value="kangal">Kangal</option>
+                                    <option selected value="kangal">Kangal</option>
                                     <option value="doberman">Doberman</option>
                                 </select>
                             </li>
@@ -90,27 +114,26 @@ const Dogs = () => {
                             </button>
                         </ul>
                     </form>
-                    <form className="d-flex mt-3" role="search">
-                        <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-                        <button className="btn btn-outline-success" type="submit">Search</button>
-                    </form>
                 </div>
                 </div>
             </div>
         </nav>
 
-        <div className='container my-5 d-flex justify-content-between flex-wrap'>
-            {dogs.length > 0 && dogs.map(dog => {
-                return (<div className="card my-5" style={{width: '20rem', height:'32rem'}} key={dog.id}>
-                    <img src={require(`../assets/images/${dog.image}`)} alt='no-image' className='w-100'/>
-                    <div className="card-body">
-                        <p className="card-text">{dog.description}</p>
-                        <Link to={`/dogs/${dog.id}`} className="btn btn-primary">Buy</Link>
-                    </div>
-                </div>)
-                })}
-            
+        <div className='container my-5 d-flex justify-content-start mx-auto flex-wrap' style={{width: "80vw"}}>
+            {
+                dogs.length > 0 && dogs.map(dog => <DogCard data={dog}/>)
+            }
+            {
+            !(dogs.length > 0) && 
+            <div className='d-flex justify-content-center w-100'>
+                <Player autoplay loop src="https://assets5.lottiefiles.com/packages/lf20_qszkkg7n.json"
+                style={{ height: '400px', width: '500px'}}></Player>
+            </div>
+            }
         </div>
+
+        {/* pagination  */}
+        <Pagination allPages={allPages()} changePage={changePage}/>
     </div>
   )
 }

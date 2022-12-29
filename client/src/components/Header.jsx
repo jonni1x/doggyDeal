@@ -4,7 +4,7 @@ import { Icon } from '@iconify/react';
 
 const Header = () => {
   return (
-    <nav className="navbar navbar-expand-lg bg-light position-fixed w-100 top-0" style={{zIndex: 99}}>
+    <nav className="navbar navbar-expand-lg d-flex justify-content-between bg-light position-fixed w-100 top-0" style={{zIndex: 99}}>
         <div className="container-fluid">
             <Link className="navbar-brand" to='/'>DogsStore.com</Link>
             <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">

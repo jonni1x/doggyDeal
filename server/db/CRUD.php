@@ -38,29 +38,46 @@ class CRUD {
 
 
     public function read($table, $id, $limit, $breed, $year, $price, $page) {
+        //Default query string
         $sql = "SELECT * FROM $table as t";
+        //Array of data that we're gonna fetch and return
         $data = [];
+        //String of conditions which we are going to concat if we have.
         $conditions = '';
 
+        //Checking if id isn't empty to concat id to $conditions string
         if(!is_null($id)) $conditions .= " id = $id";
 
+        //Checking if breed isn't empty to concat breed to $conditions string
         if(!is_null($breed)) $sql .= " INNER JOIN breed as b ON t.breed_id = b.id AND b.name = '".$breed."' ";
 
+        //Checking if year isn't empty to concat year to $conditions string
         if(!is_null($year)) $conditions .= " year = ".$year." AND";
 
+        //Checking if price isn't empty to concat price to $conditions string
         if(count($price) > 0) $conditions .= "  price > ".$price[0]." AND price < ".$price[1]." AND";
 
+        //Removing the last "AND" from $conditions string.
         $conditions = rtrim($conditions, " AND ");
 
+        //Checking if $conditions isn't empty to concat id to $sql string
         if((!empty($conditions))) {
             $sql .= " WHERE $conditions";
         } 
 
-        $totalItems = $this->mysqli->query("SELECT COUNT(*) FROM $table")->fetch_row()[0];
-        $offset = ($page - 1) * $limit;
-        $totalPages = ceil($totalItems / $limit);
-        $sql .= " LIMIT $limit OFFSET $offset";
+        // Count All data
+        $result = $this->mysqli->query($sql);
+        $totalItems = $result->num_rows;
 
+        // Total Pages
+        $totalPages = ceil($totalItems / $limit);
+
+        //Offset 
+        $offset = ($page - 1) * $limit;
+
+        //Adding limit and Offset for pagination
+        $sql .= " LIMIT $limit OFFSET $offset";
+        // Calling query function to execute $sql query string
         $res = $this->mysqli->query($sql); 
         
         if($res) {
@@ -69,8 +86,8 @@ class CRUD {
             }
             return json_encode(array(
                 $data,
-                "total-items" => $totalItems,
-                "total-pages" => $totalPages,
+                "total_items" => $totalItems,
+                "total_pages" => $totalPages,
                 "page" => $page
             ));
         }
@@ -122,28 +139,43 @@ class CRUD {
         }
     }
 
-    public function filter($query) {
-        $data = [];
-        $sql = "SELECT * FROM dogs WHERE ";
+//     public function filter($query, $limit, $page ) {
+//         $data = [];
+//         $sql = "SELECT * FROM dogs WHERE ";
 
-        if(!empty($query)) {
-        
-            foreach($query as $q) {
-                $sql .= " description LIKE '%".$q."%' OR ";
-            }
+//         if(!empty($query)) {
+//             foreach($query as $q) {
+//                 $sql .= " description LIKE '%".$q."%' OR ";
+//             }
 
-            $sql = rtrim($sql, " OR ");
+//             $sql = rtrim($sql, " OR ");
 
-            $res = $this->mysqli->query($sql); 
-        
-            if($res) {
-                foreach($res as $d) { 
-                    array_push($data, $d);
-                }
-                return json_encode($data);
-            }
-        } else {
-            return "No Query Entered";
-        }
-    }
+//             // Count All data
+//             $result = $this->mysqli->query($sql);
+//             $totalItems = $result->num_rows;
+
+//             // Total Pages
+//             $totalPages = ceil($totalItems / $limit);
+
+//             //Offset 
+//             $offset = ($page - 1) * $limit;
+
+//             //Adding limit and Offset for pagination
+//             $sql .= " LIMIT $limit OFFSET $offset";
+
+//             $res = $this->mysqli->query($sql); 
+
+//             if($res) {
+//                 foreach($res as $d) { 
+//                     array_push($data, $d);
+//                 }
+//                 return json_encode(array(
+//                     $data,
+//                     "total_items" => $totalItems,
+//                     "total_pages" => $totalPages,
+//                     "page" => $page
+//                 ));
+//             }
+//     }
+//   }
 }
