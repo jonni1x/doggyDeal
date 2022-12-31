@@ -42,6 +42,8 @@ if ($method == "POST") {
    if(isset($_GET['table'])) $table = $_GET['table'];
 
     $data = json_decode(file_get_contents('php://input'));
+    
+    return print_r($data->image[0]);
     print_r($crud->create($table, $data));
 }
 

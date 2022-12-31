@@ -2,7 +2,7 @@ import './App.css';
 import { Route, Routes } from 'react-router-dom';
 import Header from './components/Header';
 import Home from './pages/Home';
-import Rooms from './pages/Dogs';
+import Dogs from './pages/Dogs';
 import Footer from './components/Footer';
 import BookedRooms from './pages/OwnedDogs';
 import Error from './pages/Error';
@@ -17,7 +17,7 @@ function App() {
       <Header />
       <Routes>
          <Route path='/' element={<Home />}/>
-         <Route path='/dogs' element={<Rooms />}/>
+         <Route path='/dogs' element={<Dogs />}/>
          <Route path='/my-dogs' element={<BookedRooms />}/>
          <Route path='/profile' element={<Profile />} />
          <Route path='/dog/:id' element={<DogDetails />} />

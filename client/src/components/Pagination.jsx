@@ -1,24 +1,18 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import Pagination from '@mui/material/Pagination';
+import Stack from '@mui/material/Stack';
 
-const Pagination = ({allPages, changePage}) => {
-  return (
-    <nav aria-label="Page navigation example">
-            <ul className="pagination justify-content-center">
-                {
-                    allPages.map((item, i) => {
-                        return <li className="page-item">
-                            <Link 
-                            key={i} 
-                            className="page-link"
-                            onClick={e => changePage(e.target.textContent)}
-                            >{item}</Link>
-                        </li>
-                    })
-                }
-            </ul>
-        </nav>
-  )
+const PaginationComp = ({allPages, changePage, page}) => {
+
+    const handleChange = (event, value) => {
+        changePage(value);
+    }
+
+    return (
+        <Stack spacing={2}>
+            <Pagination sx={{height: "70px"}} count={allPages.length} page={page} onChange={handleChange} />
+        </Stack>
+    )
 }
 
-export default Pagination
+export default PaginationComp

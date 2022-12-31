@@ -8,21 +8,22 @@ const Test = () => {
     const phone = useRef('');
     const address = useRef('');
     const password = useRef('');
+    const [file, setFile] = useState(null);
 
-    const [items, setItems] = useState([]);
+    
     useEffect(() => {
         const data = async() => {
-            const data = await axios.get("http://localhost/dogs_store/server/api.php?table=dogs");
-            setItems(data.data[0]);
+            const data = await axios.patch("http://localhost/dogs_store/server/api.php");
+            console.log(data);
         }
-        data();
-
-        console.log(items);
+        //data();
     }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const res = await axios.delete("http://localhost/dogs_store/server/api.php?table=users&id=7");
+        const res = await axios.post("http://localhost/dogs_store/server/api.php?table=users", {
+            image: [file.name, file.type]
+        });
         if(res) {
             console.log(res.data)
         }
@@ -32,12 +33,13 @@ const Test = () => {
   return (
     <div style={{margin: "200px"}}>
         <form onSubmit={handleSubmit}>
-            <input type="text" ref={name}/>
+            {/* <input type="text" ref={name}/>
             <input type="text" ref={surname}/>
             <input type="text" ref={email}/>
             <input type="text" ref={phone}/>
             <input type="text" ref={address}/>
-            <input type="text" ref={password}/>
+            <input type="text" ref={password}/> */}
+            <input type="file" onChange={e => setFile(e.target.files[0])}/>
             <button type="submit">Submit</button>
         </form>
     </div>

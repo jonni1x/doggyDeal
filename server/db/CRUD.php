@@ -49,10 +49,10 @@ class CRUD {
         if(!is_null($id)) $conditions .= " id = $id";
 
         //Checking if breed isn't empty to concat breed to $conditions string
-        if(!is_null($breed)) $sql .= " INNER JOIN breed as b ON t.breed_id = b.id AND b.name = '".$breed."' ";
+        if(!empty($breed)) $sql .= " INNER JOIN breed as b ON t.breed_id = b.id AND b.name = '".$breed."' ";
 
         //Checking if year isn't empty to concat year to $conditions string
-        if(!is_null($year)) $conditions .= " year = ".$year." AND";
+        if(!empty($year)) $conditions .= " year = ".$year." AND";
 
         //Checking if price isn't empty to concat price to $conditions string
         if(count($price) > 0) $conditions .= "  price > ".$price[0]." AND price < ".$price[1]." AND";

@@ -4,17 +4,57 @@ import { Link } from 'react-router-dom';
 import { Player } from '@lottiefiles/react-lottie-player';
 import Pagination from '../components/Pagination';
 import DogCard from '../components/DogCard';
+import { styled, useTheme } from '@mui/material/styles';
+import Drawer from '@mui/material/Drawer';
+import MuiAppBar from '@mui/material/AppBar';
+import List from '@mui/material/List';
+import Divider from '@mui/material/Divider';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ListItem from '@mui/material/ListItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import Input from '@mui/material/Input';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Box from '@mui/material/Box';
+import EuroIcon from '@mui/icons-material/Euro';
+import { Container } from '@mui/system';
+
+const drawerWidth = 400;
+
+
+  
+  const DrawerHeader = styled('div')(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    padding: theme.spacing(0, 1),
+    // necessary for content to be below app bar
+    ...theme.mixins.toolbar,
+    justifyContent: 'flex-start',
+  }));
 
 const Dogs = () => {
     const [lowestPrice, setLowestPrice] = useState(0); 
     const [highestPrice, setHighestPrice] = useState(1000); 
-    const [breed, setBreed] = useState(null); 
-    const [year, setYear] = useState(null); 
+    const [breed, setBreed] = useState(''); 
+    const [age, setAge] = useState(''); 
     const [dogs, setDogs] = useState([]); 
     const [filter, setFilter] = useState(false);
     const [pages, setPages] = useState(1);
     const [pageNumber, setPageNumber] = useState(1);
+    const [open, setOpen] = useState(false);
+    const theme = useTheme();
 
+    const handleDrawerOpen = () => {
+        setOpen(true);
+    };
+
+    const handleDrawerClose = () => {
+        setOpen(false);
+    };
 
     const allPages = () => {
         const pagesArr = [];
@@ -29,7 +69,7 @@ const Dogs = () => {
     }
 
     const data = () => {
-        axios.get(`http://localhost/dogs_store/server/api.php?table=dogs&price=${lowestPrice}-${highestPrice}&breed=${breed}&year=${year}&page=${pageNumber}`)
+        axios.get(`http://localhost/dogs_store/server/api.php?table=dogs&price=${lowestPrice}-${highestPrice}&breed=${breed}&year=${age}&page=${pageNumber}`)
             .then(res => {
                 setPages(res.data.total_pages);
                 setDogs(res.data[0]);
@@ -48,80 +88,119 @@ const Dogs = () => {
 
   return (
     <div className='rooms' style={{marginTop: "100px"}}>
-        <nav className="navbar">
-            <button
-            className="navbar-toggler btn bg-primary text-white ms-4 py-2 px-5"
-            type="button" 
-            data-bs-toggle="offcanvas" 
-            data-bs-target="#offcanvasNavbar"
-            aria-controls="offcanvasNavbar">
-                Filter
-            </button>
-            <div className="container-fluid">
-                <div className="offcanvas offcanvas-end" tabIndex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
-                <div className="offcanvas-header">
-                    <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                </div>
-                <div className="offcanvas-body">
-                    <form onSubmit={handleFilter}>
-                        <ul className="navbar-nav justify-content-end flex-grow-1 pe-3">
-                            <li className="nav-item d-flex">
-                                <label htmlFor='lowest-price'>Lowest price</label>
-                                <input 
-                                type='number' 
-                                style={{width: "60px", marginLeft: "10px"}} 
-                                name='lowest-price'
-                                value={lowestPrice}
-                                onChange={e => {
-                                    if(e.target.value < 0) return e.target.value = 0;
+        <form onSubmit={handleFilter}>
+            <Drawer
+            sx={{
+            width: drawerWidth,
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+                width: drawerWidth,
+            },
+            }}
+            variant="persistent"
+            anchor="right"
+            open={open}
+            >
+            <DrawerHeader>
+            <IconButton onClick={handleDrawerClose}>
+                {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            </IconButton>
+            </DrawerHeader>
+                <Divider sx={{marginBottom: "20px"}}/>
+                <List sx={{padding: "0 20px"}}>
+                    <span>Price:</span>
+                    <ListItem disablePadding>
+                        <InputLabel variant="outlined" sx={{margin: "0  20px 0 0"}}>From</InputLabel> 
+                        <Input 
+                        sx={{width: "100px"}}
+                        value={lowestPrice}
+                        onChange={e => {
+                            if(e.target.value < 0) return e.target.value = 0;
 
-                                    if(e.target.value > highestPrice - 1) return e.target.value = highestPrice - 1;
-                                    setLowestPrice(e.target.value)
-                                }}
-                                />
-                                <label htmlFor='highest-price' style={{marginLeft: "10px"}}>Highest Price</label>
-                                <input
-                                type='number' 
-                                style={{width: "60px", marginLeft: "10px"}} 
-                                name='highest-price'
-                                value={highestPrice}
-                                onChange={e => setHighestPrice(e.target.value)}
-                                />
-                            </li>
-                            <li className="nav-item dropdown mt-4">
-                                <label htmlFor='breed' className='me-3'>Breed:</label>
-                                <select name="breed" id="breed" onChange={e => setBreed(e.target.value)}>
-                                    <option value="pitbull">Pitbull</option>
-                                    <option selected value="kangal">Kangal</option>
-                                    <option value="doberman">Doberman</option>
-                                </select>
-                            </li>
-                            <li className="nav-item dropdown mt-4">
-                                <label htmlFor='year' className='me-3'>Year:</label>
-                                <select className='px-2 py-2 text-success' name="year" id="year" onChange={(e) => setYear(e.target.value)}>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                </select>
-                            </li>
-                            <button className="btn btn-primary my-5 text-white ms-4 py-2 px-5"
-                            type="submit"
-                            data-bs-toggle="offcanvas" 
-                            data-bs-target="#offcanvasNavbar">
-                                Filter
-                            </button>
-                        </ul>
-                    </form>
-                </div>
-                </div>
-            </div>
-        </nav>
+                            if(e.target.value > highestPrice - 1) return e.target.value = highestPrice - 1;
+                            setLowestPrice(e.target.value)
+                        }}
+                        type="number"
+                        />
+                        <EuroIcon fontSize="string" />
+                        <InputLabel variant="outlined" sx={{margin: "0 10px"}}>To:</InputLabel> 
+                        <Input 
+                        sx={{width: "100px"}}
+                        value={highestPrice}
+                        onChange={e => {
+                            if(e.target.value < 0) return e.target.value = 0;
 
-        <div className='container my-5 d-flex justify-content-start mx-auto flex-wrap' style={{width: "80vw"}}>
+                            setHighestPrice(e.target.value)
+                        }}
+                        type="number"
+                        />
+                        <EuroIcon fontSize="string" />
+                    </ListItem>
+                    
+                </List>
+                <List>
+                    <ListItem disablePadding sx={{width: "140px", margin: "30px 0 0 20px"}}>
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-label">Age</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    value={age}
+                                    label="Age"
+                                    onChange={e => setAge(e.target.value)}
+                                >
+                                    <MenuItem value="1">One</MenuItem>
+                                    <MenuItem value="2">Two</MenuItem>
+                                    <MenuItem value="3">Three</MenuItem>
+                                    <MenuItem value="4">Four</MenuItem>
+                                    <MenuItem value="5">Five</MenuItem>
+                                </Select>
+                            </FormControl>
+                    </ListItem>
+                </List>
+                <List>
+                    <ListItem disablePadding sx={{width: "140px", margin: "30px 0 0 20px"}}>
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-label">Breed</InputLabel>
+                                <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={breed}
+                                label="Age"
+                                onChange={e => setBreed(e.target.value)}
+                                >
+                                <MenuItem value="Kangal">Kangal</MenuItem>
+                                <MenuItem value="Doberman">Doberman</MenuItem>
+                                <MenuItem value="Labrador">Labrador</MenuItem>
+                                <MenuItem value="Pitbull">Pitbull</MenuItem>
+                                </Select>
+                            </FormControl>
+                    </ListItem>
+                </List>
+                <Button 
+                variant="contained" 
+                aria-label="close drawer"
+                edge="end"
+                onClick={handleDrawerClose}
+                type="submit"
+                sx={{margin: "20px 20px", padding: "10px 30px" }}
+                > 
+                Filter 
+                </Button>
+            </Drawer>
+        </form>
+        <Button 
+            variant="contained" 
+            aria-label="open drawer"
+            edge="end"
+            onClick={handleDrawerOpen}
+            sx={{marginLeft: "150px", padding: "10px 30px" }}
+            > 
+            Filter 
+        </Button>
+        <div className='container my-5 d-flex mx-auto flex-wrap' style={{width: "77vw"}}>
             {
-                dogs.length > 0 && dogs.map(dog => <DogCard data={dog}/>)
+                dogs.length > 0 && dogs.map(dog => <DogCard key={dog.id} data={dog}/>)
             }
             {
             !(dogs.length > 0) && 
@@ -133,7 +212,10 @@ const Dogs = () => {
         </div>
 
         {/* pagination  */}
-        <Pagination allPages={allPages()} changePage={changePage}/>
+        <Container sx={{display: "flex", justifyContent: "center", margin: "60px 0"}}>
+            <Pagination allPages={allPages()} page={pageNumber} changePage={changePage}/>
+        </Container>
+        
     </div>
   )
 }

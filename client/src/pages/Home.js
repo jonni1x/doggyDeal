@@ -6,6 +6,8 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import axios from 'axios';
+import Container from '@mui/material/Container';
+import Box from '@mui/material/Box';
 
 const Home = () => {
     const [logedIn, setLogedIn] = useState(false);
@@ -30,7 +32,7 @@ const Home = () => {
         autoplay: true,
         autoplaySpeed: 2000
       };
-      let dogsSettings = {
+    let dogsSettings = {
         dots: true,
         infinite: true,
         speed: 500,
@@ -40,35 +42,17 @@ const Home = () => {
         autoplaySpeed: 2000
       };
   return (
-    <div className='home'>
-        <div className='container d-flex align-items-center' style={{marginTop: '6rem', height: '55vh'}}>
-           <div className='description'>
-            <h1>DogsStore.com</h1>
-            <p>
-            Dogs see in color, so your new ripped t-shirt in orange, purple, and yellow won't be lost on them. Signing up is easy, just enter your info above.
-            </p>
-            </div>
-            <div className='animation'>
-                <Player
-                    autoplay
-                    loop
-                    src="https://assets2.lottiefiles.com/packages/lf20_pkkire0h.json"
-                    style={{ height: '400px', width: '500px' }}
-                    >
-                </Player>
-            </div> 
+    <Box className='home' style={{maxWidth: "100%"}}>
+        <div className='hero-page' style={{display: "flex",justifyContent: "flex-start"}}>
+            <img src={require("../assets/images/dog-bg-image.jpg")} 
+            style={{width: "100%", height:"100vh", objectFit: "cover", marginBottom: "200px", position: "relative"}}
+            />   
+            <img src={require("../assets/images/dog-bone.png")}
+            style={{position: "absolute", marginTop: "100px", width: "700px"}}
+            />
         </div>
+              
         
-
-        <div className='container' style={{margin: '14rem 4rem', height: '65vh'}}>
-            <div>
-                <h2>Buy a dog</h2>
-                <button className='btn btn-primary ms-5 mb-5 px-4 py-2'>
-                    <Link to='/dogs' className='text-white text-decoration-none text-align-center'>
-                        Dogs <Icon icon='material-symbols:arrow-right-alt' />
-                    </Link>
-                </button>
-            </div>
             <div className='container' style={{height: '500px'}}>
                 <Slider {...dogsSettings}>
                 {
@@ -87,7 +71,6 @@ const Home = () => {
                 }
                 </Slider>
             </div>
-        </div>
 
         {
             !logedIn && <div className='bg-warning align-items-center d-flex p-3' style={{margin: '12rem 0', height: '15vh'}}>
@@ -134,7 +117,7 @@ const Home = () => {
         </div>
         
 
-    </div>
+    </Box>
   )
 }
 
