@@ -9,11 +9,13 @@ import Error from './pages/Error';
 import Profile from './pages/Profile';
 import Test from './pages/Test';
 import DogDetails from './pages/DogDetails';
-
+import {  QueryClient, QueryClientProvider, useQuery } from 'react-query';
 
 function App() {
+  const queryClient = new QueryClient();
+
   return (
-    <div className="App">
+    <QueryClientProvider client={queryClient} className="App">
       <Header />
       <Routes>
          <Route path='/' element={<Home />}/>
@@ -25,7 +27,7 @@ function App() {
          <Route path='*' element={<Error />} />
       </Routes>
       <Footer />
-    </div>
+    </QueryClientProvider>
   );
 }
 

@@ -57,6 +57,7 @@ class CRUD {
         //Checking if price isn't empty to concat price to $conditions string
         if(count($price) > 0) $conditions .= "  price > ".$price[0]." AND price < ".$price[1]." AND";
 
+        
         //Removing the last "AND" from $conditions string.
         $conditions = rtrim($conditions, " AND ");
 
