@@ -22,6 +22,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
 import EuroIcon from '@mui/icons-material/Euro';
 import { Container } from '@mui/system';
+import { useQuery } from 'react-query';
 
 const drawerWidth = 400;
 
@@ -41,11 +42,11 @@ const Dogs = () => {
     const [highestPrice, setHighestPrice] = useState(1000); 
     const [breed, setBreed] = useState(''); 
     const [age, setAge] = useState(''); 
-    const [dogs, setDogs] = useState([]); 
     const [filter, setFilter] = useState(false);
     const [pages, setPages] = useState(1);
     const [pageNumber, setPageNumber] = useState(1);
     const [open, setOpen] = useState(false);
+    
     const theme = useTheme();
 
     const handleDrawerOpen = () => {
@@ -68,18 +69,16 @@ const Dogs = () => {
         setPageNumber(value); 
     }
 
-    const data = () => {
-        axios.get(`http://localhost/dogs_store/server/api.php?table=dogs&price=${lowestPrice}-${highestPrice}&breed=${breed}&year=${age}&page=${pageNumber}`)
-            .then(res => {
-                setPages(res.data.total_pages);
-                setDogs(res.data[0]);
-            })
-            .catch(e => e.message);
+    const fetchDogs = async () => {
+        const res = await axios.get(`http://localhost/dogs_store/server/api.php?table=dogs&price=${lowestPrice}-${highestPrice}&breed=${breed}&year=${age}&page=${pageNumber}`)
+        setPages(res.data.total_pages);
+        return res.data[0];
     }
 
-    useEffect(() => {
-        data();
-    }, [filter, pageNumber])
+    const { isLoading, data, error } = useQuery(["dogs-data", filter, pageNumber], fetchDogs) 
+
+    if(isLoading) return <>Loading...</>
+    if(error) return <>{error}</>
 
     const handleFilter = (e) => {
         e.preventDefault();
@@ -109,8 +108,8 @@ const Dogs = () => {
                 <Divider sx={{marginBottom: "20px"}}/>
                 <List sx={{padding: "0 20px"}}>
                     <span>Price:</span>
-                    <ListItem disablePadding>
-                        <InputLabel variant="outlined" sx={{margin: "0  20px 0 0"}}>From</InputLabel> 
+                    <ListItem disablePadding >
+                        <InputLabel variant="outlined" sx={{margin: "0  20px 0 0"}}>From: </InputLabel> 
                         <Input 
                         sx={{width: "100px"}}
                         value={lowestPrice}
@@ -123,7 +122,7 @@ const Dogs = () => {
                         type="number"
                         />
                         <EuroIcon fontSize="string" />
-                        <InputLabel variant="outlined" sx={{margin: "0 10px"}}>To:</InputLabel> 
+                        <InputLabel variant="outlined" sx={{margin: "0 20px"}}>To:</InputLabel> 
                         <Input 
                         sx={{width: "100px"}}
                         value={highestPrice}
@@ -200,10 +199,10 @@ const Dogs = () => {
         </Button>
         <div className='container my-5 d-flex mx-auto flex-wrap' style={{width: "77vw"}}>
             {
-                dogs.length > 0 && dogs.map(dog => <DogCard key={dog.id} data={dog}/>)
+                data.length > 0 && data.map(dog => <DogCard key={dog.id} data={dog}/>)
             }
             {
-            !(dogs.length > 0) && 
+            !(data.length > 0) && 
             <div className='d-flex justify-content-center w-100'>
                 <Player autoplay loop src="https://assets5.lottiefiles.com/packages/lf20_qszkkg7n.json"
                 style={{ height: '400px', width: '500px'}}></Player>
@@ -212,10 +211,12 @@ const Dogs = () => {
         </div>
 
         {/* pagination  */}
-        <Container sx={{display: "flex", justifyContent: "center", margin: "60px 0"}}>
-            <Pagination allPages={allPages()} page={pageNumber} changePage={changePage}/>
-        </Container>
-        
+        {
+            data.length > 0 &&
+            <Container sx={{display: "flex", justifyContent: "center", margin: "60px 0"}}>
+                <Pagination allPages={allPages()} page={pageNumber} changePage={changePage}/>
+            </Container>
+        }
     </div>
   )
 }

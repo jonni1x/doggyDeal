@@ -14,7 +14,7 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 
 
-const Header = () => {
+const Header = ({id}) => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
 
@@ -115,11 +115,14 @@ const Header = () => {
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
-                <Link style={{textDecoration: "none", color:"black", fontSize: "1.01rem"}} to={`/offer-dog`}>Offer Dogs</Link> 
+                { id !== null ?
+                  <Link style={{textDecoration: "none", color:"black", fontSize: "1.01rem"}} to={`/offer-dog`}>Offer Dogs</Link> 
+                :
+                <Link style={{textDecoration: "none", color:"black", fontSize: "1.01rem"}} to={`/login`}>Offer Dogs</Link>  }
               </Button>
           </Box>
 
-          <Box sx={{ flexGrow: 0}}>
+          {id !== null ? <Box sx={{ flexGrow: 0}}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
               <Avatar sx={{ bgcolor: "orange" }}>NO</Avatar>
@@ -157,7 +160,20 @@ const Header = () => {
                 </Typography>
               </MenuItem>
             </Menu>
-          </Box>
+          </Box> :
+           <>
+            <Button
+                  sx={{ my: 2, color: 'white', display: 'block' }}
+                >
+                  <Link style={{textDecoration: "none", color:"black", fontSize: "1.01rem"}} to={`/login`}>Login</Link> 
+            </Button>
+            <Button
+                  sx={{ my: 2, color: 'white', display: 'block' }}
+                >
+                  <Link style={{textDecoration: "none", color:"black", fontSize: "1.01rem"}} to={`/register`}>Register</Link> 
+            </Button>
+           </>
+           }
         </Toolbar>
       </Container>
     </AppBar>

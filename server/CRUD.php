@@ -1,6 +1,8 @@
 <?php
-include 'Database.php';
-
+include './db/Database.php';
+require __DIR__ . '/vendor/autoload.php';
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 class CRUD {
     private $mysqli;
@@ -140,6 +142,76 @@ class CRUD {
         }
     }
 
+    public function register($data) {
+        $data = (array) json_decode(file_get_contents('php://input'));
+        $name = $this->mysqli->real_escape_string($data['name']);
+        $surname = $this->mysqli->real_escape_string($data['surname']);
+        $email = $this->mysqli->real_escape_string($data['email']);
+        $phone = $this->mysqli->real_escape_string($data['phone']);
+        $address = $this->mysqli->real_escape_string($data['address']);
+        $password = password_hash( $this->mysqli->real_escape_string($data['password']), PASSWORD_BCRYPT);
+        $role = 'user';
+
+        $validateEmail = $this->mysqli->query("SELECT * FROM users where email = '$email'");
+
+        if($validateEmail->num_rows > 0){ 
+            return json_encode(["created" => "failed", "message" => "Email is already used"]);
+        }
+
+        if(isset($data['role'])) $role = $data['role'];
+
+        $sql = "INSERT INTO users (name, surname, email, phone, address, password, role) VALUES ('$name', '$surname', '$email', '$phone', '$address', '$password', '$role')";
+
+        if($this->mysqli->query($sql)) {
+            return json_encode([
+                "created" => "success",
+                "message" => "User Created Succesfully"
+            ]);
+        } else {
+            return json_encode([
+                "created" => "failed",
+                "message" => "Something Went Wrong"
+            ]);
+        }
+    }
+
+    public function login($data) {
+        $email = $data['email'];
+        $password = $data['password'];
+
+        $data = $this->mysqli->query("SELECT * FROM users WHERE email = '$email'");
+
+        if($data->num_rows < 1) {
+            return json_encode([
+                "login" => "failed",
+                "message" => "Email or Password is incorrect"
+            ]);
+        }
+
+        foreach($data as $user) {
+            if(password_verify($password, $user['password'])) {
+                $secret = 'sec!ReT423*&';
+                $payload = [
+                    'user_id' => $user['id'],
+                    'role' => $user['role'],
+                    'iat' => 1356999524,
+                    'exp_date' => time() + (3600 * 24)
+                ];
+
+                $token = JWT::encode($payload, $secret, 'HS256');
+
+                return json_encode([
+                    "token" => $token,
+                    "message" => "Login success"
+                ]);
+            } else {
+                return json_encode([
+                    "login" => "failed",
+                    "message" => "Email or Password is incorrect"
+                ]);
+            }
+        }
+    }
 //     public function filter($query, $limit, $page ) {
 //         $data = [];
 //         $sql = "SELECT * FROM dogs WHERE ";

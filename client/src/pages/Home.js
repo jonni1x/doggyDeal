@@ -17,8 +17,7 @@ import VisibilitySensor from 'react-visibility-sensor';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 
-const Home = () => {
-    const [logedIn, setLogedIn] = useState(false);
+const Home = ({ id }) => {
 
     const fetchDogs = async () => {
         const response = await axios.get(
@@ -65,7 +64,7 @@ const Home = () => {
             />
         </div>
         {
-        !logedIn && 
+        id === null && 
         <Container sx={{display: "flex", alignItems: "center", justifyContent: "space-around", marginBottom: "200px"}}>
             <Player
                     autoplay

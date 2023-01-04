@@ -3,7 +3,7 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: *");
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH');
 
-include_once "./db/CRUD.php";
+include_once "CRUD.php";
 $crud = new CRUD;
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -70,6 +70,8 @@ if($method == "DELETE") {
 
    print_r($crud->delete($table, $id));
 }
+
+
 
 ?>
 
