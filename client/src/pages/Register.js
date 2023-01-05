@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Container from '@mui/material/Container';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
@@ -124,6 +124,7 @@ const Register = () => {
                 > 
                 Register 
                 </Button>
+                <Link to='/login'>Already Have An Account?</Link>
         </form>
     </Container>
     

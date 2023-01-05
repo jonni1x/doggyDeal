@@ -1,5 +1,5 @@
 import './App.css';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import Home from './pages/Home';
 import Dogs from './pages/Dogs';
@@ -13,16 +13,24 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import { useEffect, useState } from 'react';
 import jwt_decode from 'jwt-decode';
+import CreateDog from './pages/CreateDog';
 
 function App() {
   const queryClient = new QueryClient();
   const [ role, setRole ] = useState(null);
   const [ id, setId ] = useState(null);
   const [logedIn, setLogedIn] = useState(false);
+  const navigate = useNavigate('/');
 
-  const changeLogIn = (val) => {
-    setLogedIn(val);
+  const changeLogIn = () => {
+    setLogedIn(!logedIn);
   } 
+
+  const logOut = () => {
+    sessionStorage.removeItem("token");
+    setId(null);
+    setRole(null);
+  }
 
   useEffect(() => {
     if(sessionStorage.getItem("token")) {
@@ -34,11 +42,12 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient} className="App">
-      <Header id={id}/>
+      <Header id={id} logOut={logOut}/>
       <Routes>
          <Route path='/' element={<Home id={id}/>}/>
          <Route path='/dogs' element={<Dogs />}/>
          <Route path='/my-dogs' element={<OwnedDogs id={id}/>}/>
+         <Route path='/offer-dog' element={<CreateDog id={id}/>}/>
          <Route path='/profile' element={<Profile id={id}/>} />
          <Route path='/dog/:id' element={<DogDetails />} />
          <Route path='/register' element={<Register />} />

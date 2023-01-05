@@ -38,8 +38,7 @@ class CRUD {
         }
     }
 
-
-    public function read($table, $id, $limit, $breed, $year, $price, $page) {
+    public function read($table, $id, $limit, $breed, $age, $price, $page) {
         //Default query string
         $sql = "SELECT * FROM $table as t";
         //Array of data that we're gonna fetch and return
@@ -54,12 +53,11 @@ class CRUD {
         if(!empty($breed)) $sql .= " INNER JOIN breed as b ON t.breed_id = b.id AND b.name = '".$breed."' ";
 
         //Checking if year isn't empty to concat year to $conditions string
-        if(!empty($year)) $conditions .= " year = ".$year." AND";
-
+        if(!empty($age)) $conditions .= " age = ".$age." AND";
+        
         //Checking if price isn't empty to concat price to $conditions string
         if(count($price) > 0) $conditions .= "  price > ".$price[0]." AND price < ".$price[1]." AND";
 
-        
         //Removing the last "AND" from $conditions string.
         $conditions = rtrim($conditions, " AND ");
 
@@ -80,6 +78,7 @@ class CRUD {
 
         //Adding limit and Offset for pagination
         $sql .= " LIMIT $limit OFFSET $offset";
+        
         // Calling query function to execute $sql query string
         $res = $this->mysqli->query($sql); 
         
@@ -95,7 +94,6 @@ class CRUD {
             ));
         }
     }
-
 
     public function update($table, $id, $data) {
         $sql =  "UPDATE $table SET";

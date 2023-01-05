@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Player } from '@lottiefiles/react-lottie-player';
 import { Link } from 'react-router-dom';
 import { Icon } from '@iconify/react';
@@ -18,7 +18,6 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 
 const Home = ({ id }) => {
-
     const fetchDogs = async () => {
         const response = await axios.get(
           "http://localhost/dogs_store/server/api.php?table=dogs&limit=10000"

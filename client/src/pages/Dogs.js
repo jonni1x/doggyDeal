@@ -70,13 +70,14 @@ const Dogs = () => {
     }
 
     const fetchDogs = async () => {
-        const res = await axios.get(`http://localhost/dogs_store/server/api.php?table=dogs&price=${lowestPrice}-${highestPrice}&breed=${breed}&year=${age}&page=${pageNumber}`)
+        const res = await axios.get(`http://localhost/dogs_store/server/api.php?table=dogs&price=${lowestPrice}-${highestPrice}&breed=${breed}&age=${age}&page=${pageNumber}`)
         setPages(res.data.total_pages);
         return res.data[0];
     }
 
     const { isLoading, data, error } = useQuery(["dogs-data", filter, pageNumber], fetchDogs) 
 
+    
     if(isLoading) return <>Loading...</>
     if(error) return <>{error}</>
 
@@ -199,7 +200,7 @@ const Dogs = () => {
         </Button>
         <div className='container my-5 d-flex mx-auto flex-wrap' style={{width: "77vw"}}>
             {
-                data.length > 0 && data.map(dog => <DogCard key={dog.id} data={dog}/>)
+                data !== null && data.map(dog => <DogCard key={dog.id} data={dog}/>)
             }
             {
             !(data.length > 0) && 

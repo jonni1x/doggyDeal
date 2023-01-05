@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -12,11 +12,13 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
+import { useQuery } from 'react-query';
+import axios from 'axios';
 
-
-const Header = ({id}) => {
+const Header = ({id, logOut}) => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
+  const navigate = useNavigate();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -32,6 +34,17 @@ const Header = ({id}) => {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+  const randomColor = () => {
+    let maxVal = 0xFFFFFF;
+    let randomNumber = Math.random() * maxVal;
+    randomNumber = Math.floor(randomNumber);
+    randomNumber = randomNumber.toString(16);
+    let randColor = randomNumber.padStart(6, 0);
+    return randColor;
+  }
+
+  console.log(randomColor())
 
   return (
     <AppBar position="sticky" sx={{backgroundColor: "#7a9383"}}>
@@ -125,7 +138,7 @@ const Header = ({id}) => {
           {id !== null ? <Box sx={{ flexGrow: 0}}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-              <Avatar sx={{ bgcolor: "orange" }}>NO</Avatar>
+              <Avatar sx={{ bgcolor: `#${randomColor()}`}}></Avatar>
               </IconButton>
             </Tooltip>
             <Menu
@@ -156,7 +169,7 @@ const Header = ({id}) => {
               </MenuItem>
               <MenuItem onClick={handleCloseUserMenu}>
                 <Typography textAlign="center">
-                  <Link style={{textDecoration: "none", color:"black"}}>Log Out</Link>
+                  <Link style={{textDecoration: "none", color:"black"}} onClick={() => logOut()}>Log Out</Link>
                 </Typography>
               </MenuItem>
             </Menu>
