@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -12,13 +12,13 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
+import fetchOne from '../fetchers/fetchOne';
 import { useQuery } from 'react-query';
-import axios from 'axios';
 
-const Header = ({id, logOut}) => {
+
+const Header = ({id, role, logOut}) => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const navigate = useNavigate();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -34,17 +34,18 @@ const Header = ({id, logOut}) => {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+  
 
-  const randomColor = () => {
-    let maxVal = 0xFFFFFF;
-    let randomNumber = Math.random() * maxVal;
-    randomNumber = Math.floor(randomNumber);
-    randomNumber = randomNumber.toString(16);
-    let randColor = randomNumber.padStart(6, 0);
-    return randColor;
-  }
+  const { isLoading, data, error } = useQuery("initials", () => 
+    fetchOne(`http://localhost/dogs_store/server/api.php?table=users&id=${id}`), 
+    {
+      // The query will not execute until the userId exists
+      enabled: !!id,
+    }
+  )
 
-  console.log(randomColor())
+  if(isLoading) return <>Loading...</>
+  console.log(data);
 
   return (
     <AppBar position="sticky" sx={{backgroundColor: "#7a9383"}}>
@@ -138,7 +139,9 @@ const Header = ({id, logOut}) => {
           {id !== null ? <Box sx={{ flexGrow: 0}}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-              <Avatar sx={{ bgcolor: `#${randomColor()}`}}></Avatar>
+              <Avatar sx={{ bgcolor: "orange" }}>
+                  {data.name.slice(0,1) + data.surname.slice(0,1)}
+              </Avatar>
               </IconButton>
             </Tooltip>
             <Menu
@@ -167,6 +170,20 @@ const Header = ({id, logOut}) => {
                   <Link style={{textDecoration: "none", color:"black"}} to='/my-dogs'>My Dogs</Link>
                 </Typography>
               </MenuItem>
+              {role == 'admin' && 
+               <>
+               <MenuItem onClick={handleCloseUserMenu}>
+                <Typography textAlign="center">
+                  <Link style={{textDecoration: "none", color:"black"}} to='/dashboard/dogs'>All Dogs</Link>
+                </Typography>
+              </MenuItem>
+              <MenuItem onClick={handleCloseUserMenu}>
+                <Typography textAlign="center">
+                  <Link style={{textDecoration: "none", color:"black"}} to='/dashboard/breeds'>All Breeds</Link>
+                </Typography>
+              </MenuItem>
+              </>
+              }
               <MenuItem onClick={handleCloseUserMenu}>
                 <Typography textAlign="center">
                   <Link style={{textDecoration: "none", color:"black"}} onClick={() => logOut()}>Log Out</Link>

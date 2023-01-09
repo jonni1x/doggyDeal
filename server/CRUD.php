@@ -24,8 +24,9 @@ class CRUD {
             return "No data received";
         }
 
+        $res = $this->mysqli->query($sql);
         //Check if query is executed
-        if($this->mysqli->query($sql)) {
+        if($res) {
             return json_encode([
                 "created" => "true",
                 "message" => "Created Successfully"
@@ -38,7 +39,7 @@ class CRUD {
         }
     }
 
-    public function read($table, $id, $limit, $breed, $age, $price, $page) {
+    public function read($table, $id, $limit, $breed, $age, $price, $page, $user_id) {
         //Default query string
         $sql = "SELECT * FROM $table as t";
         //Array of data that we're gonna fetch and return
@@ -55,6 +56,8 @@ class CRUD {
         //Checking if year isn't empty to concat year to $conditions string
         if(!empty($age)) $conditions .= " age = ".$age." AND";
         
+        if(!empty($user_id)) $conditions .= " user_id = ".$user_id." AND";
+
         //Checking if price isn't empty to concat price to $conditions string
         if(count($price) > 0) $conditions .= "  price > ".$price[0]." AND price < ".$price[1]." AND";
 
@@ -90,8 +93,14 @@ class CRUD {
                 $data,
                 "total_items" => $totalItems,
                 "total_pages" => $totalPages,
-                "page" => $page
+                "page" => $page,
+                "status" => http_response_code(200) 
             ));
+        } else {
+            return json_encode([
+              "message" => "Server isn't working...",
+              "status" => http_response_code(404)   
+            ]);
         }
     }
 
@@ -100,6 +109,7 @@ class CRUD {
 
         if(!empty($data)) {
             foreach($data as $column=>$val) {
+                if($column == 'password') continue;
                 $sql .= "`".$column."`='".$this->mysqli->real_escape_string($val)."', ";
             }
             $sql = rtrim($sql, ' , ');
@@ -107,9 +117,15 @@ class CRUD {
             return "No data received";
         }
 
+        if(isset($data['password'])) {
+            $password = password_hash( $this->mysqli->real_escape_string($data['password']), PASSWORD_BCRYPT);
+            $sql .= ", `password`='".$this->mysqli->real_escape_string($password)."' ";
+        }
+
         if(!is_null($id)) {
             $sql .= " WHERE id = $id";
         }
+
 
         if($this->mysqli->query($sql)) {
             return json_encode([
@@ -187,7 +203,23 @@ class CRUD {
         }
 
         foreach($data as $user) {
-            if(password_verify($password, $user['password'])) {
+            if($user['role'] == 'admin' && ($password == $user['password'])) {
+                $secret = 'sec!ReT423*&';
+                $payload = [
+                    'user_id' => $user['id'],
+                    'role' => $user['role'],
+                    'iat' => 1356999524,
+                    'exp_date' => time() + (3600 * 24)
+                ];
+
+                $token = JWT::encode($payload, $secret, 'HS256');
+
+                return json_encode([
+                    "token" => $token,
+                    "message" => "Login success"
+                ]);
+            }
+                if($user['role'] == 'user' && password_verify($password, $user['password'])) {
                 $secret = 'sec!ReT423*&';
                 $payload = [
                     'user_id' => $user['id'],

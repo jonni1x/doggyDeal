@@ -1,19 +1,7 @@
 import axios, { all } from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { Player } from '@lottiefiles/react-lottie-player';
-import Pagination from '../components/Pagination';
-import DogCard from '../components/DogCard';
-import { styled, useTheme } from '@mui/material/styles';
-import Drawer from '@mui/material/Drawer';
-import MuiAppBar from '@mui/material/AppBar';
-import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
 import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ListItem from '@mui/material/ListItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Input from '@mui/material/Input';
@@ -21,6 +9,8 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import EuroIcon from '@mui/icons-material/Euro';
 import { Container } from '@mui/system';
+import { useQuery } from 'react-query';
+import fetchAll from '../fetchers/fetchAll';
 
 const CreateDog = ( {id} ) => {
     const [breed, setBreed] = useState(''); 
@@ -48,6 +38,13 @@ const CreateDog = ( {id} ) => {
         }
         console.log(response)
     }
+
+    const { isLoading, data, error } = useQuery("breeds", () => 
+    fetchAll("http://localhost/dogs_store/server/api.php?table=breed")); 
+
+    if(isLoading) return <>Loading...</>
+    if(error) return <>{error}</>
+    
     return (
         <Container sx={{margin: "200px 0"}}>
             <h2 style={{width: "200px", margin: "0 auto", fontFamily: "'Oswald', sans-serif"}}>Offer A Dog</h2>
@@ -103,10 +100,9 @@ const CreateDog = ( {id} ) => {
                         label="Age"
                         onChange={e => setBreed(e.target.value)}
                     >
-                    <MenuItem value="1">Kangal</MenuItem>
-                    <MenuItem value="2">Doberman</MenuItem>
-                    <MenuItem value="3">Labrador</MenuItem>
-                    <MenuItem value="4">Pitbull</MenuItem>
+                        {data.data && data.data.map(breed => {
+                            return <MenuItem key={breed.id} value={breed.id}>{breed.name}</MenuItem>
+                        })}
                     </Select>
                 </FormControl>
                 <Button 

@@ -16,6 +16,7 @@ if ($method == "GET") {
     $age = null;
     $price = [];
     $page = 1;
+    $user_id = '';
 
     if(isset($_GET['table'])) $table = $_GET['table'];
 
@@ -27,13 +28,15 @@ if ($method == "GET") {
 
     if(isset($_GET['age']) && ($_GET['age']) !== 'null') $age = $_GET['age'];
     
+    if(isset($_GET['user_id'])) $user_id = $_GET['user_id'];
+
     if(isset($_GET['price'])) {
         $price = explode('-', $_GET['price']);
     }
 
     if(isset($_GET['page'])) $page = $_GET['page'];
 
-    print_r($crud->read($table, $id, $limit, $breed, $age, $price, $page));
+    print_r($crud->read($table, $id, $limit, $breed, $age, $price, $page, $user_id));
 } 
 
 if ($method == "POST") {
@@ -60,11 +63,12 @@ if($method == "PATCH") {
 
     if(isset($_GET['table'])) $table = $_GET['table'];
 
-    $data = json_decode(file_get_contents('php://input'));
+    $data = (array) json_decode(file_get_contents('php://input'));
 
     if(isset($_GET['id'])) $id = $_GET['id']; 
-
-    json_encode($crud->update($table, $id, $data));
+    
+    
+    print_r($crud->update($table, $id, $data));
 }
 
 if($method == "DELETE") {

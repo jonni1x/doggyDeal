@@ -31,15 +31,6 @@ const Home = ({ id }) => {
 
     if (error) return `An error has occurred: ${error.message}`;
 
-    let feedbackSettings = {
-        dots: true,
-        infinite: true,
-        speed: 500,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        autoplay: true,
-        autoplaySpeed: 2000
-      };
     let dogsSettings = {
         dots: true,
         infinite: true,
@@ -94,11 +85,7 @@ const Home = ({ id }) => {
             </Slider>
         </Container>
 
-        <Container sx={{height:"400px", marginTop: "300px"}}>
-            <Typography variant='h4' 
-            sx={{ textAlign: "center", marginBottom: "100px", fontFamily: "'Oswald', sans-serif"}}>
-                Who Are We?
-            </Typography>
+        <Container sx={{height:"400px", marginTop: "400px"}}>
             <div style={{display: "flex", justifyContent: "space-around"}}>
                 <Typography variant="p" fontSize="1.6rem" sx={{width: "340px", display: 'flex', flexWrap: "wrap"}}>
                     <strong>DoggyDeal.com</strong> is a website which allows users to <strong>buy and sell dogs.</strong>
@@ -119,61 +106,6 @@ const Home = ({ id }) => {
             </div>
             
         </Container>
-
-        <Container sx={{margin: "20rem 4rem"}}>
-            <Typography variant="h4" sx={{margin: "5rem 0"}}>What Clients Say:</Typography>
-            <Slider {...feedbackSettings}>
-                <Card sx={{ maxWidth: "100%", minHeight: "250px", margin: "0 40px" }}>
-                    <CardContent>
-                        <Typography gutterBottom variant="h4" component="div">
-                            Lizard
-                        </Typography>
-                        <Typography variant="subtitle1" color="text.secondary">
-                            Lizards are a widespread group of squamate reptiles, with over 6,000
-                            species, ranging across all continents except Antarctica
-                        </Typography>
-                    </CardContent>
-                </Card>
-                <Card sx={{ maxWidth: "100%", minHeight: "250px", margin: "0 40px" }}>
-                    <CardContent>
-                        <Typography gutterBottom variant="h4" component="div">
-                            Lizard
-                        </Typography>
-                        <Typography variant="subtitle1" color="text.secondary">
-                            Lizards are a widespread group of squamate reptiles, with over 6,000
-                            species, ranging across all continents except Antarctica
-                        </Typography>
-                    </CardContent>
-                </Card>
-                <Card sx={{ maxWidth: "100%", minHeight: "250px", margin: "0 40px" }}>
-                    <CardContent>
-                        <Typography gutterBottom variant="h4" component="div">
-                            Lizard
-                        </Typography>
-                        <Typography variant="subtitle1" color="text.secondary">
-                            Lizards are a widespread group of squamate reptiles, with over 6,000
-                            species, ranging across all continents except Antarctica
-                        </Typography>
-                    </CardContent>
-                </Card>
-                <Card sx={{ maxWidth: "100%", minHeight: "250px", margin: "0 40px" }}>
-                    <CardContent>
-                        <Typography gutterBottom variant="h4" component="div">
-                            Lizard
-                        </Typography>
-                        <Typography variant="subtitle1" color="text.secondary">
-                            Lizards are a widespread group of squamate reptiles, with over 6,000
-                            species, ranging across all continents except Antarctica
-                        </Typography>
-                    </CardContent>
-                </Card>
-            </Slider>
-            <Link to='feedbacks' class="btn btn-primary mt-5 px-5 py-2">
-                Leave a Feedback <Icon icon='material-symbols:arrow-right-alt' />
-            </Link>
-        </Container>
-        
-
     </Box>
   )
 }

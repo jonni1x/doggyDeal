@@ -23,6 +23,7 @@ import Box from '@mui/material/Box';
 import EuroIcon from '@mui/icons-material/Euro';
 import { Container } from '@mui/system';
 import { useQuery } from 'react-query';
+import fetchAll from '../fetchers/fetchAll';
 
 const drawerWidth = 400;
 
@@ -69,23 +70,25 @@ const Dogs = () => {
         setPageNumber(value); 
     }
 
-    const fetchDogs = async () => {
-        const res = await axios.get(`http://localhost/dogs_store/server/api.php?table=dogs&price=${lowestPrice}-${highestPrice}&breed=${breed}&age=${age}&page=${pageNumber}`)
-        setPages(res.data.total_pages);
-        return res.data[0];
-    }
-
-    const { isLoading, data, error } = useQuery(["dogs-data", filter, pageNumber], fetchDogs) 
-
+    const { data : breeds } = useQuery(["breeds"], () => 
+        fetchAll(`http://localhost/dogs_store/server/api.php?table=breed`)
+    )  
     
+ 
+    const { isLoading, data: dogs, error } = useQuery(["dogs-data", filter, pageNumber], () => 
+        fetchAll(`http://localhost/dogs_store/server/api.php?table=dogs&limit=10&price=${lowestPrice}-${highestPrice}&breed=${breed}&age=${age}&page=${pageNumber}`)
+    ) 
+
     if(isLoading) return <>Loading...</>
     if(error) return <>{error}</>
+
+    if(dogs && dogs.total_pages) setPages(dogs.totalPages)
 
     const handleFilter = (e) => {
         e.preventDefault();
         setFilter(!filter);
     }
-
+    
   return (
     <div className='rooms' style={{marginTop: "100px"}}>
         <form onSubmit={handleFilter}>
@@ -149,11 +152,11 @@ const Dogs = () => {
                                     label="Age"
                                     onChange={e => setAge(e.target.value)}
                                 >
-                                    <MenuItem value="1">One</MenuItem>
-                                    <MenuItem value="2">Two</MenuItem>
-                                    <MenuItem value="3">Three</MenuItem>
-                                    <MenuItem value="4">Four</MenuItem>
-                                    <MenuItem value="5">Five</MenuItem>
+                                    <MenuItem value={1}>One</MenuItem>
+                                    <MenuItem value={2}>Two</MenuItem>
+                                    <MenuItem value={3}>Three</MenuItem>
+                                    <MenuItem value={4}>Four</MenuItem>
+                                    <MenuItem value={5}>Five</MenuItem>
                                 </Select>
                             </FormControl>
                     </ListItem>
@@ -169,10 +172,9 @@ const Dogs = () => {
                                 label="Age"
                                 onChange={e => setBreed(e.target.value)}
                                 >
-                                <MenuItem value="Kangal">Kangal</MenuItem>
-                                <MenuItem value="Doberman">Doberman</MenuItem>
-                                <MenuItem value="Labrador">Labrador</MenuItem>
-                                <MenuItem value="Pitbull">Pitbull</MenuItem>
+                                { breeds.data && breeds.data.map(breed => {
+                                    return <MenuItem key={breed.id} value={breed.name}>{breed.name}</MenuItem>
+                                })}
                                 </Select>
                             </FormControl>
                     </ListItem>
@@ -200,10 +202,10 @@ const Dogs = () => {
         </Button>
         <div className='container my-5 d-flex mx-auto flex-wrap' style={{width: "77vw"}}>
             {
-                data !== null && data.map(dog => <DogCard key={dog.id} data={dog}/>)
+               dogs !== null && dogs.data.map(dog => <DogCard key={dog.id} data={dog}/>)
             }
             {
-            !(data.length > 0) && 
+            dogs == null && 
             <div className='d-flex justify-content-center w-100'>
                 <Player autoplay loop src="https://assets5.lottiefiles.com/packages/lf20_qszkkg7n.json"
                 style={{ height: '400px', width: '500px'}}></Player>
@@ -213,7 +215,7 @@ const Dogs = () => {
 
         {/* pagination  */}
         {
-            data.length > 0 &&
+            dogs !== null &&
             <Container sx={{display: "flex", justifyContent: "center", margin: "60px 0"}}>
                 <Pagination allPages={allPages()} page={pageNumber} changePage={changePage}/>
             </Container>
